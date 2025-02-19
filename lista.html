@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        li:hover {
+            background: #ddd;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    <input type="text" id="nome" placeholder="Nome">
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="password" id="senha" placeholder="Senha">
+    <button id="login">Login</button>
+
+    <h2>Lista de Usuários</h2>
+    <ul id="listaUsuarios"></ul>
+
+    <script>
+        const botaoLogin = document.getElementById('login');
+        const listaUsuarios = document.getElementById('listaUsuarios');
+
+        function carregarUsuarios() {
+            const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            listaUsuarios.innerHTML = '';
+            usuarios.forEach((usuario, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${usuario.nome} (${usuario.email})`;
+
+                // Botão para remover usuário
+                const botaoRemover = document.createElement('button');
+                botaoRemover.textContent = 'Remover';
+                botaoRemover.addEventListener('click', function() {
+                    removerUsuario(index);
+                });
+
+                li.appendChild(botaoRemover);
+                listaUsuarios.appendChild(li);
+            });
+        }
+
+        function removerUsuario(index) {
+            let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            usuarios.splice(index, 1); // Remove pelo índice
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            carregarUsuarios();
+        }
+
+        botaoLogin.addEventListener('click', function() {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value.trim();
+
+            if (nome && email && senha) {
+                let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+                
+                // Evita cadastro duplicado (verifica pelo e-mail)
+                if (!usuarios.some(u => u.email === email)) {
+                    usuarios.push({ nome, email, senha });
+                    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                } else {
+                    alert('Este e-mail já está cadastrado!');
+                }
+                
+                carregarUsuarios();
+                alert(`Bem-vindo, ${nome}!`);
+            } else {
+                alert('Preencha todos os campos!');
+            }
+        });
+
+        // Carregar a lista ao abrir a página
+        carregarUsuarios();
+    </script>
+</body>
+</html>
